@@ -1,0 +1,17 @@
+parameters:
+    snowcap_elastica.indexes: []
+
+services:
+    snowcap_elastica.service:
+        class: Snowcap\ElasticaBundle\Service
+        arguments: [@snowcap_elastica.client]
+        calls:
+            - [setContainer, [ @service_container ]]
+            - [setIndexes, [ %snowcap_elastica.indexes% ]]
+    snowcap_elastica.client:
+        class: Snowcap\ElasticaBundle\Client
+    snowcap_elastica.subscriber:
+        class: Snowcap\ElasticaBundle\Listener\IndexSubscriber
+        arguments: [@snowcap_elastica.service]
+        tags:
+            - { name: doctrine.event_subscriber }
