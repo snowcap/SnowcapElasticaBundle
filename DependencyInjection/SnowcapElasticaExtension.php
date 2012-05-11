@@ -28,5 +28,9 @@ class SnowcapElasticaExtension extends Extension
         foreach (array('indexes') as $attribute) {
             $container->setParameter('snowcap_elastica.' . $attribute , $config[$attribute]);
         }
+
+        if(isset($config['config'])) {
+            $container->setParameter('snowcap_elastica.config', $config['config']);
+        }
     }
 }

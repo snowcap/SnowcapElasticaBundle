@@ -1,5 +1,6 @@
 parameters:
     snowcap_elastica.indexes: []
+    snowcap_elastica.config: []
 
 services:
     snowcap_elastica.service:
@@ -10,6 +11,7 @@ services:
             - [setIndexes, [ %snowcap_elastica.indexes% ]]
     snowcap_elastica.client:
         class: Snowcap\ElasticaBundle\Client
+        arguments: [%snowcap_elastica.config%]
     snowcap_elastica.subscriber:
         class: Snowcap\ElasticaBundle\Listener\IndexSubscriber
         arguments: [@snowcap_elastica.service]

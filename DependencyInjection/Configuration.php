@@ -21,11 +21,16 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('snowcap_elastica');
         $rootNode
             ->children()
+                ->arrayNode('config')
+                    ->useAttributeAsKey('key')
+                    ->prototype('variable')
+                    ->treatNullLike(array())
+                ->end()->end()
                 ->arrayNode('indexes')
                     ->useAttributeAsKey('key')
                     ->prototype('variable')
                     ->treatNullLike(array())
-                ->end()
+                ->end()->end()
             ->end()
         ;
 
