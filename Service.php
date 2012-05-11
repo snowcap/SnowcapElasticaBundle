@@ -139,7 +139,7 @@ class Service extends ContainerAware
         $search = new \Elastica_Search($this->client);
         $search->addIndex($index);
         $search->addTypes($types);
-        return $search->search(urlencode($query));
+        return $search->search($query);
     }
 
     /**
