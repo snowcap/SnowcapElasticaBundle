@@ -123,6 +123,22 @@ class Service extends ContainerAware
         }
     }
 
+    public function indexRemove($entity)
+    {
+        foreach ($this->indexes as $indexName => $indexParams) {
+            $index = $this->client->getIndex($indexName);
+            foreach ($this->indexers as $indexerAlias => $indexer) {
+                if($indexer->supports($entity)) {
+                    $type = $index->getType($indexerAlias);
+                    $indexableEntity = $indexer->getIndexableEntity($entity);
+                    if($indexableEntity->getId() !== null) {
+                        $indexer->removeIndexById($indexableEntity->getId(), $type);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Perform a simple search on the given index and types
      *

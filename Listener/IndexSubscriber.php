@@ -35,7 +35,7 @@ class IndexSubscriber implements EventSubscriber {
      */
     public function getSubscribedEvents()
     {
-        return array('postPersist', 'postUpdate', 'postRemove');
+        return array('postPersist', 'postUpdate', 'preRemove');
     }
 
     /**
@@ -57,9 +57,9 @@ class IndexSubscriber implements EventSubscriber {
     /**
      * @param \Doctrine\ORM\Event\LifecycleEventArgs $ea
      */
-    public function postRemove(LifecycleEventArgs $ea)
+    public function preRemove(LifecycleEventArgs $ea)
     {
-        $this->index($ea->getEntity());
+        $this->indexRemove($ea->getEntity());
     }
 
     /**
@@ -69,6 +69,16 @@ class IndexSubscriber implements EventSubscriber {
     {
         if(in_array(get_class($entity), $this->managedClasses)) {
             $this->elastica->index($entity);
+        }
+    }
+
+    /**
+     * @param $entity
+     */
+    private function indexRemove($entity)
+    {
+        if(in_array(get_class($entity), $this->managedClasses)) {
+            $this->elastica->indexRemove($entity);
         }
     }
 

@@ -112,6 +112,15 @@ interface IndexerInterface {
     public function removeIndex($entity, \Elastica_Type $type);
 
     /**
+     * Remove (if existing) the elasticsearch document for the provided id
+     *
+     * @abstract
+     * @param integer $id
+     * @param \Elastica_Type $type
+     */
+    public function removeIndexById($id, \Elastica_Type $type);
+
+    /**
      * Store the entity manager
      *
      * @abstract

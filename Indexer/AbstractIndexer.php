@@ -59,6 +59,15 @@ abstract class AbstractIndexer implements IndexerInterface
     }
 
     /**
+     * @param integer $id
+     * @param \Elastica_Type $type
+     */
+    public function removeIndexById($id, \Elastica_Type $type)
+    {
+        $type->deleteById($id);
+    }
+
+    /**
      * @param \Doctrine\ORM\EntityManager $em
      */
     public function setEntityManager(EntityManager $em)
