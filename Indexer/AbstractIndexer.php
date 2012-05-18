@@ -55,7 +55,10 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     public function removeIndex($entity, \Elastica_Type $type)
     {
-        $type->deleteById($this->getDocumentIdentifier($entity));
+        try {
+            $type->deleteById($this->getDocumentIdentifier($entity));
+        }
+        catch(\InvalidArgumentException $e){}
     }
 
     /**
