@@ -26,6 +26,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('variable')
                     ->treatNullLike(array())
                 ->end()->end()
+                ->scalarNode('namespace')->isRequired()->end()
                 ->arrayNode('indexes')
                     ->useAttributeAsKey('key')
                     ->prototype('variable')

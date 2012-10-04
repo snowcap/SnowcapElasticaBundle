@@ -5,7 +5,7 @@ parameters:
 services:
     snowcap_elastica.service:
         class: Snowcap\ElasticaBundle\Service
-        arguments: [@snowcap_elastica.client]
+        arguments: [@snowcap_elastica.client, %snowcap_elastica.namespace%]
         calls:
             - [setContainer, [ @service_container ]]
             - [setIndexes, [ %snowcap_elastica.indexes% ]]

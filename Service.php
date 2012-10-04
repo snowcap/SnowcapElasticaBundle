@@ -17,6 +17,11 @@ class Service extends ContainerAware
     protected $client;
 
     /**
+     * @var string
+     */
+    protected $namespace;
+
+    /**
      * @var array
      */
     protected $indexes = array();
@@ -34,9 +39,10 @@ class Service extends ContainerAware
     /**
      * @param Client $client
      */
-    public function __construct(Client $client)
+    public function __construct(Client $client, $namespace)
     {
         $this->client = $client;
+        $this->namespace = $namespace;
     }
 
     /**
@@ -153,7 +159,7 @@ class Service extends ContainerAware
             $types = array_keys($this->indexers);
         }
         $search = new \Elastica_Search($this->client);
-        $search->addIndex($index);
+        $search->addIndex($this->addNamespace($index));
         $search->addTypes($types);
         return $search->search($query);
     }
@@ -186,7 +192,15 @@ class Service extends ContainerAware
      */
     public function setIndexes(array $indexes)
     {
-        $this->indexes = $indexes;
+        $namespacedIndexes = array();
+        foreach($indexes as $indexName => $indexParams) {
+            $namespacedIndexes[$this->addNamespace($indexName)] = $indexParams;
+        }
+        $this->indexes = $namespacedIndexes;
+    }
+
+    private function addNamespace($indexName) {
+        return $this->namespace . '.' . $indexName;
     }
 
 }

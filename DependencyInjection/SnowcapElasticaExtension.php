@@ -25,12 +25,8 @@ class SnowcapElasticaExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        foreach (array('indexes') as $attribute) {
+        foreach (array('indexes', 'config', 'namespace') as $attribute) {
             $container->setParameter('snowcap_elastica.' . $attribute , $config[$attribute]);
-        }
-
-        if(isset($config['config'])) {
-            $container->setParameter('snowcap_elastica.config', $config['config']);
         }
     }
 }
