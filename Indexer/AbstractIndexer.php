@@ -23,11 +23,11 @@ abstract class AbstractIndexer implements IndexerInterface
 
     /**
      * @param object $entity
-     * @return mixed
+     * @return array
      */
-    public function getIndexableEntity($entity)
+    public function getIndexableEntities($entity)
     {
-        return $entity;
+        return array($entity);
     }
 
     /**

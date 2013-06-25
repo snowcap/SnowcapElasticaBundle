@@ -63,16 +63,16 @@ interface IndexerInterface {
     public function getEntitiesToIndex(EntityManager $em, \Elastica_Type $type);
 
     /**
-     * Get the entity to index provided a given entity
-     * In simple cases, this method should simply return the provided entity
+     * Get the entities to index provided a given entity
+     * In simple cases, this method should simply return an array with the provided entity
      * In some cases, however (depending on the classes returned by getManagedClasses
      * you might want, given an entity of class Foo, index in fact an associated entity of class Bar
      *
      * @abstract
      * @param object $entity
-     * @return object
+     * @return array
      */
-    public function getIndexableEntity($entity);
+    public function getIndexableEntities($entity);
 
     /**
      * Determine the elasticsearch document identifier

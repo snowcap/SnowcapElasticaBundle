@@ -107,23 +107,27 @@ class Service extends ContainerAware
             foreach ($this->indexers as $indexerAlias => $indexer) {
                 if($indexer->supports($entity)) {
                     $type = $index->getType($indexerAlias);
-                    $indexableEntity = $indexer->getIndexableEntity($entity);
 
-                    if($this->container->get('doctrine.orm.entity_manager')->getUnitOfWork()->isScheduledForDelete($indexableEntity)) {
-                        $action = IndexerInterface::ACTION_REMOVE;
-                    }
-                    else {
-                        $action = $indexer->getIndexAction($indexableEntity, $type);
+                    $indexableEntities = $indexer->getIndexableEntities($entity);
+                    foreach ($indexableEntities as $indexableEntity) {
+
+                        if($this->container->get('doctrine.orm.entity_manager')->getUnitOfWork()->isScheduledForDelete($indexableEntity)) {
+                            $action = IndexerInterface::ACTION_REMOVE;
+                        }
+                        else {
+                            $action = $indexer->getIndexAction($indexableEntity, $type);
+                        }
+
+                        switch($action) {
+                            case IndexerInterface::ACTION_ADD:
+                                $indexer->addIndex($indexableEntity, $type);
+                                break;
+                            case IndexerInterface::ACTION_REMOVE:
+                                $indexer->removeIndex($indexableEntity, $type);
+                                break;
+                        }
                     }
 
-                    switch($action) {
-                        case IndexerInterface::ACTION_ADD:
-                            $indexer->addIndex($indexableEntity, $type);
-                            break;
-                        case IndexerInterface::ACTION_REMOVE:
-                            $indexer->removeIndex($indexableEntity, $type);
-                            break;
-                    }
                 }
             }
         }
