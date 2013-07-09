@@ -140,7 +140,7 @@ class Service extends ContainerAware
             foreach ($this->indexers as $indexerAlias => $indexer) {
                 if($indexer->supports($entity)) {
                     $type = $index->getType($indexerAlias);
-                    $indexableEntity = $indexer->getIndexableEntity($entity);
+                    $indexableEntity = $indexer->getIndexableEntities($entity);
                     if($indexableEntity->getId() !== null) {
                         $indexer->removeIndexById($indexableEntity->getId(), $type);
                     }
