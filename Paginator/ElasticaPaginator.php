@@ -28,8 +28,6 @@ class ElasticaPaginator extends AbstractPaginator
      */
     private $index;
 
-    const DEFAULT_LIMIT_PER_PAGE = 10;
-
     /**
      * @param \Elastica_Query $query
      * @param $index
@@ -72,14 +70,10 @@ class ElasticaPaginator extends AbstractPaginator
      */
     public function setLimitPerPage($limitPerPage)
     {
-<<<<<<< Updated upstream
-        $limitPerPage = $limitPerPage > 0 ? $limitPerPage : self::DEFAULT_LIMIT_PER_PAGE;
-=======
         if ($limitPerPage <= 0) {
-            throw new \InvalidArgumentException('The limit per page should be is invalid');
+            throw new \InvalidArgumentException('The limit per page is invalid');
         }
 
->>>>>>> Stashed changes
         $this->limitPerPage = $limitPerPage;
 
         return $this;
