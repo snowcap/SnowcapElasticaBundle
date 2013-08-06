@@ -28,6 +28,8 @@ class ElasticaPaginator extends AbstractPaginator
      */
     private $index;
 
+    const DEFAULT_LIMIT_PER_PAGE = 10;
+
     /**
      * @param \Elastica_Query $query
      * @param $index
@@ -69,6 +71,7 @@ class ElasticaPaginator extends AbstractPaginator
      */
     public function setLimitPerPage($limitPerPage)
     {
+        $limitPerPage = $limitPerPage > 0 ? $limitPerPage : self::DEFAULT_LIMIT_PER_PAGE;
         $this->limitPerPage = $limitPerPage;
 
         return $this;
@@ -94,7 +97,7 @@ class ElasticaPaginator extends AbstractPaginator
         $this->elasticaQuery->setFrom($this->getOffset());
         $this->elasticaQuery->setLimit($this->limitPerPage);
 
-        $this->resultSet = $this->elastica->search($this->elasticaQuery, strtolower($this->index));
+        $this->resultSet = $this->elastica->search($this->elasticaQuery, $this->index);
 
         return new \ArrayIterator($this->resultSet->getResults());
     }
