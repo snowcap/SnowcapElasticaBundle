@@ -68,10 +68,18 @@ class ElasticaPaginator extends AbstractPaginator
     /**
      * @param int $limitPerPage
      * @return ElasticaPaginator
+     * @throws \InvalidArgumentException
      */
     public function setLimitPerPage($limitPerPage)
     {
+<<<<<<< Updated upstream
         $limitPerPage = $limitPerPage > 0 ? $limitPerPage : self::DEFAULT_LIMIT_PER_PAGE;
+=======
+        if ($limitPerPage <= 0) {
+            throw new \InvalidArgumentException('The limit per page should be is invalid');
+        }
+
+>>>>>>> Stashed changes
         $this->limitPerPage = $limitPerPage;
 
         return $this;
