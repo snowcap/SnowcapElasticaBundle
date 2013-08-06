@@ -156,7 +156,7 @@ class Service extends ContainerAware
      * Perform a simple search on the given index and types
      *
      * @param string $query
-     * @param array $index
+     * @param string|array $index
      * @param array $types
      * @return \Elastica_ResultSet
      */
