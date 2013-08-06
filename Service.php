@@ -156,25 +156,23 @@ class Service extends ContainerAware
      * Perform a simple search on the given index and types
      *
      * @param string $query
-     * @param string $index
+     * @param array $index
      * @param array $types
      * @return \Elastica_ResultSet
      */
     public function search($query, $index, $types = null)
     {
+        $search = new \Elastica_Search($this->client);
+
+        if (!is_array($index)) {
+            $index = array($index);
+        }
         if($types === null) {
             $types = array_keys($this->indexers);
         }
-        $search = new \Elastica_Search($this->client);
 
-        // if $index is an array we perform the search on multiple indexes
-        // otherwise, we just perform the search on the given index
-        if (is_array($index)) {
-            foreach ($index as $idx) {
-                $search->addIndex($this->addNamespace($idx));
-            }
-        } else {
-            $search->addIndex($this->addNamespace($index));
+        foreach ($index as $idx) {
+            $search->addIndex($this->addNamespace($idx));
         }
 
         $search->addTypes($types);
