@@ -166,7 +166,17 @@ class Service extends ContainerAware
             $types = array_keys($this->indexers);
         }
         $search = new \Elastica_Search($this->client);
-        $search->addIndex($this->addNamespace($index));
+
+        // if $index is an array we perform the search on multiple indexes
+        // otherwise, we just perform the search on the given index
+        if (is_array($index)) {
+            foreach ($index as $idx) {
+                $search->addIndex($this->addNamespace($idx));
+            }
+        } else {
+            $search->addIndex($this->addNamespace($index));
+        }
+
         $search->addTypes($types);
         return $search->search($query);
     }
