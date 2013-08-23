@@ -31,13 +31,13 @@ class ElasticaPaginator extends AbstractPaginator
     /**
      * @param \Elastica_Query $query
      * @param $index
+     * @param Service $elastica
      */
-    public function __construct(\Elastica_Query $query, $index)
+    public function __construct(\Elastica_Query $query, $index, Service $elastica = null)
     {
         $this->elasticaQuery = $query;
         $this->index = $index;
-
-        return $this;
+        $this->elastica = $elastica;
     }
 
     /**
@@ -53,11 +53,14 @@ class ElasticaPaginator extends AbstractPaginator
 
     /**
      * @param int $page
-     * @return ElasticaPaginator
+     * @return $this|\Snowcap\CoreBundle\Paginator\PaginatorInterface
+     * @throws \InvalidArgumentException
      */
     public function setPage($page)
     {
-        $page = $page > 0 ? $page : 1;
+        if($page < 1) {
+            throw new \InvalidArgumentException('The page is invalid');
+        }
         $this->page = $page;
 
         return $this;
@@ -73,7 +76,6 @@ class ElasticaPaginator extends AbstractPaginator
         if ($limitPerPage <= 0) {
             throw new \InvalidArgumentException('The limit per page is invalid');
         }
-
         $this->limitPerPage = $limitPerPage;
 
         return $this;
@@ -84,8 +86,8 @@ class ElasticaPaginator extends AbstractPaginator
      */
     public function count()
     {
-        if ($this->resultSet == null) {
-            $this->getIterator();
+        if (null === $this->resultSet) {
+            $this->search();
         }
 
         return $this->resultSet->getTotalHits();
@@ -96,12 +98,11 @@ class ElasticaPaginator extends AbstractPaginator
      */
     public function getIterator()
     {
-        $this->elasticaQuery->setFrom($this->getOffset());
-        $this->elasticaQuery->setLimit($this->limitPerPage);
+        if (null === $this->resultSet) {
+            $this->search();
+        }
 
-        $this->resultSet = $this->elastica->search($this->elasticaQuery, $this->index);
-
-        return new \ArrayIterator($this->resultSet->getResults());
+        return $this->resultSet;
     }
 
     /**
@@ -109,10 +110,17 @@ class ElasticaPaginator extends AbstractPaginator
      */
     public function getResultSet()
     {
-        if ($this->resultSet == null) {
-            $this->getIterator();
-        }
-
         return $this->resultSet;
+    }
+
+    /**
+     * Launch the search
+     *
+     */
+    private function search()
+    {
+        $this->elasticaQuery->setLimit($this->limitPerPage);
+        $this->elasticaQuery->setFrom($this->getOffset());
+        $this->resultSet = $this->elastica->search($this->elasticaQuery, $this->index);
     }
 }
