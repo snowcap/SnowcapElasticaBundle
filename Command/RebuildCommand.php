@@ -21,9 +21,14 @@ class RebuildCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $timeStart = microtime(true);
+
         $output->writeln('Rebuilding all elastica indexes');
         $elastica = $this->getContainer()->get('snowcap_elastica.service');
         $elastica->createIndexes();
         $elastica->reindex();
+
+        $time = number_format(microtime(true) - $timeStart, 3);
+        $output->writeln('Rebuilt indexes in ' . $time . ' seconds.');
     }
 }
