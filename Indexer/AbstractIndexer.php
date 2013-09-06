@@ -18,7 +18,22 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     public function supports($entity)
     {
-        return in_array(get_class($entity), $this->getManagedClasses());
+        $supports = false;
+
+        if(in_array(get_class($entity), $this->getManagedClasses())) {
+            $supports = true;
+        }
+
+        if (!$supports) {
+            // if the entity is a Proxy
+            foreach ($this->getManagedClasses() as $class) {
+                if ($entity instanceof $class) {
+                    $supports = true;
+                }
+            }
+        }
+
+        return $supports;
     }
 
     /**

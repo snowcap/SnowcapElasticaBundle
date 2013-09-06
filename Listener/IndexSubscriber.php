@@ -67,8 +67,20 @@ class IndexSubscriber implements EventSubscriber {
      */
     private function index($entity)
     {
+        $dealt = false;
+
         if(in_array(get_class($entity), $this->managedClasses)) {
             $this->elastica->index($entity);
+            $dealt = true;
+        }
+
+        if (!$dealt) {
+            foreach ($this->managedClasses as $class) {
+                // if the entity is a Proxy
+                if ($entity instanceof $class) {
+                    $this->elastica->index($entity);
+                }
+            }
         }
     }
 
