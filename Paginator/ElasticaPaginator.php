@@ -110,6 +110,10 @@ class ElasticaPaginator extends AbstractPaginator
      */
     public function getResultSet()
     {
+        if (null === $this->resultSet) {
+            $this->search();
+        }
+
         return $this->resultSet;
     }
 
