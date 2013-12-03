@@ -3,6 +3,7 @@
 namespace Snowcap\ElasticaBundle\Indexer;
 
 use Doctrine\ORM\EntityManager;
+use Elastica\Type;
 
 interface IndexerInterface {
 
@@ -46,10 +47,10 @@ interface IndexerInterface {
      *
      * @abstract
      * @param object $entity
-     * @param \Elastica_Type $type
+     * @param Type $type
      * @return string
      */
-    public function getIndexAction($entity, \Elastica_Type $type);
+    public function getIndexAction($entity, Type $type);
 
     /**
      * Return an array of all the entities that need to be reindexed
@@ -57,10 +58,10 @@ interface IndexerInterface {
      *
      * @abstract
      * @param \Doctrine\ORM\EntityManager $em
-     * @param \Elastica_Type $type
+     * @param Type $type
      * @return array
      */
-    public function getEntitiesToIndex(EntityManager $em, \Elastica_Type $type);
+    public function getEntitiesToIndex(EntityManager $em, Type $type);
 
     /**
      * Get the entities to index provided a given entity
@@ -88,37 +89,37 @@ interface IndexerInterface {
      *
      * @abstract
      * @param object $entity
-     * @param \Elastica_Type $type
+     * @param Type $type
      * @return array
      */
-    public function map($entity, \Elastica_Type $type);
+    public function map($entity, Type $type);
 
     /**
      * Add (or update) an elasticsearch document for the provided entity
      *
      * @abstract
      * @param object $entity
-     * @param \Elastica_Type $type
+     * @param Type $type
      */
-    public function addIndex($entity, \Elastica_Type $type);
+    public function addIndex($entity, Type $type);
 
     /**
      * Remove (if existing) the elasticsearch document for the provided entity
      *
      * @abstract
      * @param object $entity
-     * @param \Elastica_Type $type
+     * @param Type $type
      */
-    public function removeIndex($entity, \Elastica_Type $type);
+    public function removeIndex($entity, Type $type);
 
     /**
      * Remove (if existing) the elasticsearch document for the provided id
      *
      * @abstract
      * @param integer $id
-     * @param \Elastica_Type $type
+     * @param Type $type
      */
-    public function removeIndexById($id, \Elastica_Type $type);
+    public function removeIndexById($id, Type $type);
 
     /**
      * Store the entity manager

@@ -2,14 +2,16 @@
 
 namespace Snowcap\ElasticaBundle\Paginator;
 
-use Doctrine\ORM\AbstractQuery;
 use Snowcap\CoreBundle\Paginator\AbstractPaginator;
 use Snowcap\ElasticaBundle\Service;
+
+use Elastica\Query;
+use Elastica\ResultSet;
 
 class ElasticaPaginator extends AbstractPaginator
 {
     /**
-     * @var \Elastica_Query
+     * @var Query
      */
     private $elasticaQuery;
 
@@ -19,7 +21,7 @@ class ElasticaPaginator extends AbstractPaginator
     private $elastica;
 
     /**
-     * @var \Elastica_ResultSet
+     * @var ResultSet
      */
     private $resultSet = null;
 
@@ -29,11 +31,11 @@ class ElasticaPaginator extends AbstractPaginator
     private $index;
 
     /**
-     * @param \Elastica_Query $query
+     * @param Query $query
      * @param $index
      * @param Service $elastica
      */
-    public function __construct(\Elastica_Query $query, $index, Service $elastica = null)
+    public function __construct(Query $query, $index, Service $elastica = null)
     {
         $this->elasticaQuery = $query;
         $this->index = $index;
@@ -106,7 +108,7 @@ class ElasticaPaginator extends AbstractPaginator
     }
 
     /**
-     * @return \Elastica_ResultSet
+     * @return ResultSet
      */
     public function getResultSet()
     {
