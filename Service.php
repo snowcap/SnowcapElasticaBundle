@@ -3,8 +3,11 @@
 namespace Snowcap\ElasticaBundle;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\Collections\ArrayCollection;
+
+use Elastica\Index;
+use Elastica\ResultSet;
+use Elastica\Search;
+use Elastica\Type\Mapping;
 
 use Snowcap\ElasticaBundle\Indexer\IndexerInterface;
 
@@ -38,6 +41,7 @@ class Service extends ContainerAware
 
     /**
      * @param Client $client
+     * @param string $namespace
      */
     public function __construct(Client $client, $namespace)
     {
@@ -61,17 +65,16 @@ class Service extends ContainerAware
     /**
      * Create types associated with the given index
      *
-     * @param \Elastica_Index $index
+     * @param Index $index
      */
-    protected function createTypes(\Elastica_Index $index)
+    protected function createTypes(Index $index)
     {
         foreach ($this->indexers as $indexerAlias => $indexer) {
             $type = $index->getType($indexerAlias);
-            $mapping = new \Elastica_Type_Mapping();
+
+            $mapping = new Mapping();
             $mapping->setType($type);
-
             $mapping->setProperties($indexer->getMappings());
-
             $mapping->send();
         }
     }
@@ -158,11 +161,11 @@ class Service extends ContainerAware
      * @param string $query
      * @param string|array $index
      * @param array $types
-     * @return \Elastica_ResultSet
+     * @return ResultSet
      */
     public function search($query, $index, $types = null)
     {
-        $search = new \Elastica_Search($this->client);
+        $search = new Search($this->client);
 
         if (!is_array($index)) {
             $index = array($index);

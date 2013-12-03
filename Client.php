@@ -2,6 +2,8 @@
 
 namespace Snowcap\ElasticaBundle;
 
-class Client extends \Elastica_Client {
+use Elastica\Client as BaseClient;
+
+class Client extends BaseClient {
 
 }

@@ -3,6 +3,8 @@
 namespace Snowcap\ElasticaBundle\Indexer;
 
 use Doctrine\ORM\EntityManager;
+use Elastica\Document;
+use Elastica\Type;
 
 abstract class AbstractIndexer implements IndexerInterface
 {
@@ -56,19 +58,19 @@ abstract class AbstractIndexer implements IndexerInterface
 
     /**
      * @param object $entity
-     * @param \Elastica_Type $type
+     * @param Type $type
      */
-    public function addIndex($entity, \Elastica_Type $type)
+    public function addIndex($entity, Type $type)
     {
-        $document = new \Elastica_Document($this->getDocumentIdentifier($entity), $this->map($entity, $type));
+        $document = new Document($this->getDocumentIdentifier($entity), $this->map($entity, $type));
         $type->addDocument($document);
     }
 
     /**
      * @param object $entity
-     * @param \Elastica_Type $type
+     * @param Type $type
      */
-    public function removeIndex($entity, \Elastica_Type $type)
+    public function removeIndex($entity, Type $type)
     {
         try {
             $type->deleteById($this->getDocumentIdentifier($entity));
@@ -78,9 +80,9 @@ abstract class AbstractIndexer implements IndexerInterface
 
     /**
      * @param integer $id
-     * @param \Elastica_Type $type
+     * @param Type $type
      */
-    public function removeIndexById($id, \Elastica_Type $type)
+    public function removeIndexById($id, Type $type)
     {
         $type->deleteById($id);
     }
