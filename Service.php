@@ -146,7 +146,15 @@ class Service extends ContainerAware
                     $indexableEntities = $indexer->getIndexableEntities($entity);
                     foreach ($indexableEntities as $indexableEntity) {
                         if($indexableEntity->getId() !== null) {
-                            $indexer->removeIndexById($indexableEntity->getId(), $type);
+                            if (get_class($entity) === get_class($indexableEntity)) {
+                                $indexer->removeIndexById($indexableEntity->getId(), $type);
+                            } else {
+                                // Special case: a managed entity has been removed, but
+                                // it isn't the main indexable entity, so instead of
+                                // removing anything, we need to update the indexable entity
+                                // to let him know some of his related is gone
+                                $indexer->addIndex($indexableEntity, $type);
+                            }
                         }
                     }
 
