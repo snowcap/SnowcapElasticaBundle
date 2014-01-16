@@ -4,6 +4,7 @@ namespace Snowcap\ElasticaBundle\Indexer;
 
 use Doctrine\ORM\EntityManager;
 use Elastica\Document;
+use Elastica\Exception\NotFoundException;
 use Elastica\Type;
 
 abstract class AbstractIndexer implements IndexerInterface
@@ -76,6 +77,7 @@ abstract class AbstractIndexer implements IndexerInterface
             $type->deleteById($this->getDocumentIdentifier($entity));
         }
         catch(\InvalidArgumentException $e){}
+        catch(NotFoundException $e){}
     }
 
     /**
