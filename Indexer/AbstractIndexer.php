@@ -73,11 +73,7 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     public function removeIndex($entity, Type $type)
     {
-        try {
-            $type->deleteById($this->getDocumentIdentifier($entity));
-        }
-        catch(\InvalidArgumentException $e){}
-        catch(NotFoundException $e){}
+        $this->removeIndexById($this->getDocumentIdentifier($entity), $type);
     }
 
     /**
@@ -86,7 +82,11 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     public function removeIndexById($id, Type $type)
     {
-        $type->deleteById($id);
+        try {
+            $type->deleteById($id);
+        }
+        catch(\InvalidArgumentException $e){}
+        catch(NotFoundException $e){}
     }
 
     /**
