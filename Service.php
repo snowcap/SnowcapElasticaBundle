@@ -11,7 +11,12 @@ use Elastica\Type\Mapping;
 
 use Snowcap\ElasticaBundle\Indexer\IndexerInterface;
 
-class Service extends ContainerAware
+/**
+ * This service class is the main entry point for Elastica operations
+ *
+ * @package Snowcap\ElasticaBundle
+ */
+class Service extends ContainerAware implements ServiceInterface
 {
 
     /**
