@@ -4,11 +4,17 @@ namespace Snowcap\ElasticaBundle\Listener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
+use Snowcap\ElasticaBundle\ServiceInterface;
 
-use Snowcap\ElasticaBundle\Service;
-
-class IndexSubscriber implements EventSubscriber {
-
+/**
+ * This subscriber class listens to Doctrine events and, depending on the registered indexers, automatically
+ * triggers index/unindex operations
+ *
+ * @package Snowcap\ElasticaBundle\Listener
+ */
+class IndexSubscriber implements EventSubscriber
+{
     /**
      * @var \Snowcap\ElasticaBundle\Service
      */
@@ -20,14 +26,26 @@ class IndexSubscriber implements EventSubscriber {
     private $managedClasses = array();
 
     /**
-     * @param \Snowcap\ElasticaBundle\Service $elastica
+     * @var array
      */
-    public function __construct(Service $elastica) {
+    private $scheduledIndexations = array();
+
+    /**
+     * @var array
+     */
+    private $scheduledUnindexations = array();
+
+    /**
+     * @param \Snowcap\ElasticaBundle\ServiceInterface $elastica
+     */
+    public function __construct(ServiceInterface $elastica)
+    {
         $this->elastica = $elastica;
-        foreach($elastica->getIndexers() as $indexer) {
+        foreach ($elastica->getIndexers() as $indexer) {
             $this->managedClasses = array_merge($this->managedClasses, $indexer->getManagedClasses());
         }
     }
+
     /**
      * Returns an array of events this subscriber wants to listen to.
      *
@@ -35,7 +53,7 @@ class IndexSubscriber implements EventSubscriber {
      */
     public function getSubscribedEvents()
     {
-        return array('postPersist', 'postUpdate', 'preRemove');
+        return array('postPersist', 'postUpdate', 'preRemove', 'postFlush');
     }
 
     /**
@@ -43,7 +61,7 @@ class IndexSubscriber implements EventSubscriber {
      */
     public function postPersist(LifecycleEventArgs $ea)
     {
-        $this->index($ea->getEntity());
+        $this->scheduleForIndexation($ea->getEntity());
     }
 
     /**
@@ -51,7 +69,7 @@ class IndexSubscriber implements EventSubscriber {
      */
     public function postUpdate(LifecycleEventArgs $ea)
     {
-        $this->index($ea->getEntity());
+        $this->scheduleForIndexation($ea->getEntity());
     }
 
     /**
@@ -59,39 +77,64 @@ class IndexSubscriber implements EventSubscriber {
      */
     public function preRemove(LifecycleEventArgs $ea)
     {
-        $this->indexRemove($ea->getEntity());
+        $this->scheduleForUnindexation($ea->getEntity());
     }
 
     /**
-     * @param $entity
+     * We trigger index/unindex operations on postFlush events
+     *
+     * @param PostFlushEventArgs $ea
      */
-    private function index($entity)
+    public function postFlush(PostFlushEventArgs $ea)
     {
-        $dealt = false;
-
-        if(in_array(get_class($entity), $this->managedClasses)) {
+        foreach($this->scheduledIndexations as $entity)
+        {
             $this->elastica->index($entity);
-            $dealt = true;
         }
+        $this->scheduledIndexations = array();
 
-        if (!$dealt) {
-            foreach ($this->managedClasses as $class) {
-                // if the entity is a Proxy
-                if ($entity instanceof $class) {
-                    $this->elastica->index($entity);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param $entity
-     */
-    private function indexRemove($entity)
-    {
-        if(in_array(get_class($entity), $this->managedClasses)) {
+        foreach($this->scheduledUnindexations as $entity)
+        {
             $this->elastica->indexRemove($entity);
         }
+        $this->scheduledUnindexations = array();
     }
 
+    /**
+     * Schedule the provided entity for an index operation
+     *
+     * @param $entity
+     */
+    private function scheduleForIndexation($entity)
+    {
+        if ($this->isManaged($entity) && !in_array($entity, $this->scheduledIndexations)) {
+            $this->scheduledIndexations[] = $entity;
+        }
+    }
+
+    /**
+     * Schedule the provided entity for an unindex operation
+     *
+     * @param $entity
+     */
+    private function scheduleForUnindexation($entity)
+    {
+        if ($this->isManaged($entity) && !in_array($entity, $this->scheduledUnindexations)) {
+            $this->scheduledUnindexations[]= $entity;
+        }
+    }
+
+    /**
+     * Determines if the provided entity is managed by the Elastica subscriber
+     *
+     * @param object $entity
+     * @return bool
+     */
+    private function isManaged($entity)
+    {
+        $entityClasses = array_merge(array(get_class($entity)), class_parents($entity));
+        $intersection = array_intersect($entityClasses, $this->managedClasses);
+
+        return count($intersection) > 0;
+    }
 }
