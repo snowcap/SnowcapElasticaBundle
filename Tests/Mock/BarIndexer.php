@@ -1,6 +1,6 @@
 <?php
 
-namespace Snowcap\ElasticaBundle\Tests\Listener\Mock;
+namespace Snowcap\ElasticaBundle\Tests\Mock;
 
 use Doctrine\ORM\EntityManager;
 use Elastica\Type;
@@ -9,9 +9,9 @@ use Snowcap\ElasticaBundle\Indexer\IndexerInterface;
 /**
  * Mock indexers for unit tests
  *
- * @package Snowcap\ElasticaBundle\Tests\Listener\Mock
+ * @package Snowcap\ElasticaBundle\Tests\Mock
  */
-class FooIndexer implements IndexerInterface {
+class BarIndexer implements IndexerInterface {
     /**
      * Return an array of classes managed by this indexer
      * Must at least contain the class name of the main entity you wish to index, and may
@@ -22,12 +22,7 @@ class FooIndexer implements IndexerInterface {
      */
     public function getManagedClasses()
     {
-        return array(
-            'Snowcap\ElasticaBundle\Tests\Listener\Mock\FooEntity',
-            // Notice the lowercased entity name - we actually want to test this... should work even if the actual
-            // class name is BazEntity with a capital E
-            'Snowcap\ElasticaBundle\Tests\Listener\Mock\Bazentity'
-        );
+        return array('Snowcap\ElasticaBundle\Tests\Mock\BarEntity');
     }
 
     /**
