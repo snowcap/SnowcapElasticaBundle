@@ -6,6 +6,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Snowcap\ElasticaBundle\Listener\IndexSubscriber;
 use Snowcap\ElasticaBundle\Tests\Listener\Mock\BarEntity;
+use Snowcap\ElasticaBundle\Tests\Listener\Mock\BazEntity;
 use Snowcap\ElasticaBundle\Tests\Listener\Mock\FooEntity;
 use Snowcap\ElasticaBundle\Tests\Listener\Mock\FooEntityProxy;
 
@@ -25,6 +26,26 @@ class IndexSubscriberTest extends \PHPUnit_Framework_TestCase
         $indexSubscriber = new IndexSubscriber($service);
 
         $ea = new LifecycleEventArgs($foo, $em);
+        $indexSubscriber->postPersist($ea);
+
+        $ea = new PostFlushEventArgs($em);
+        $indexSubscriber->postFlush($ea);
+    }
+
+    public function testLowercaseRelevantEntityIsIndexedWhenPersisted()
+    {
+        $em = $this->getMock('Doctrine\ORM\EntityManager', [], [], '', false);
+        $baz  = new BazEntity();
+
+        $service = $this->getMock('Snowcap\ElasticaBundle\Tests\Listener\Mock\Service', ['index']);
+        $service
+            ->expects($this->once())
+            ->method('index')
+            ->with($this->equalTo($baz));
+
+        $indexSubscriber = new IndexSubscriber($service);
+
+        $ea = new LifecycleEventArgs($baz, $em);
         $indexSubscriber->postPersist($ea);
 
         $ea = new PostFlushEventArgs($em);

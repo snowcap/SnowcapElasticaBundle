@@ -200,9 +200,17 @@ class Service extends ContainerAware implements ServiceInterface
      *
      * @param string $alias
      * @param Indexer\IndexerInterface $indexer
+     * @throws \UnexpectedValueException
      */
     public function registerIndexer($alias, IndexerInterface $indexer)
     {
+        foreach($indexer->getManagedClasses() as $managedClass) {
+            if(!class_exists($managedClass)) {
+                $message = 'Invalid managed class "%s" provided in indexer "%s"';
+                throw new \UnexpectedValueException(sprintf($message, $managedClass, get_class($indexer)));
+            }
+        }
+
         $this->indexers[$alias] = $indexer;
     }
 

@@ -132,9 +132,21 @@ class IndexSubscriber implements EventSubscriber
      */
     private function isManaged($entity)
     {
-        $entityClasses = array_merge(array(get_class($entity)), class_parents($entity));
-        $intersection = array_intersect($entityClasses, $this->managedClasses);
+        $managed = false;
 
-        return count($intersection) > 0;
+        if(in_array(get_class($entity), $this->managedClasses)) {
+            $managed = true;
+        }
+
+        if (!$managed) {
+            // if the entity is a Proxy
+            foreach ($this->managedClasses as $class) {
+                if ($entity instanceof $class) {
+                    $managed = true;
+                }
+            }
+        }
+
+        return $managed;
     }
 }
