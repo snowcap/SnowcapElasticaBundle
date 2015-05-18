@@ -9,11 +9,27 @@ services:
         calls:
             - [setContainer, [ @service_container ]]
             - [setIndexes, [ %snowcap_elastica.indexes% ]]
+
     snowcap_elastica.client:
         class: Snowcap\ElasticaBundle\Client
         arguments: [%snowcap_elastica.config%]
+        calls:
+            - [setLogger, [ @snowcap_elastica.logger ]]
+
     snowcap_elastica.subscriber:
         class: Snowcap\ElasticaBundle\Listener\IndexSubscriber
         arguments: [@snowcap_elastica.service]
         tags:
             - { name: doctrine.event_subscriber }
+
+    snowcap_elastica.logger:
+        class: Snowcap\ElasticaBundle\Logger\ElasticaLogger
+        arguments: [ @logger, %kernel.debug% ]
+        tags:
+            - { name: monolog.logger, channel: elastica }
+
+    snowcap_elastica.data_collector:
+        class: Snowcap\ElasticaBundle\DataCollector\ElasticaDataCollector
+        arguments: [ @snowcap_elastica.logger ]
+        tags:
+            - { name: data_collector, template: "SnowcapElasticaBundle:Collector:elastica", id: "elastica" }
