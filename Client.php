@@ -30,7 +30,7 @@ class Client extends BaseClient
     public function request($path, $method = Request::GET, $data = array(), array $query = array())
     {
         if ($this->stopwatch) {
-            $this->stopwatch->start('es_request', 'fos_elastica');
+            $this->stopwatch->start('es_request', 'snowcap_elastica');
         }
         $start = microtime(true);
         $response = parent::request($path, $method, $data, $query);
