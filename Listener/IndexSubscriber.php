@@ -107,8 +107,9 @@ class IndexSubscriber implements EventSubscriber
      */
     private function scheduleForIndexation($entity)
     {
-        if ($this->isManaged($entity) && !in_array($entity, $this->scheduledIndexations)) {
-            $this->scheduledIndexations[] = $entity;
+        $entityHash = spl_object_hash($entity);
+        if ($this->isManaged($entity) && !isset($this->scheduledIndexations[$entityHash])) {
+            $this->scheduledIndexations[$entityHash] = $entity;
         }
     }
 
@@ -119,8 +120,9 @@ class IndexSubscriber implements EventSubscriber
      */
     private function scheduleForUnindexation($entity)
     {
-        if ($this->isManaged($entity) && !in_array($entity, $this->scheduledUnindexations)) {
-            $this->scheduledUnindexations[]= $entity;
+        $entityHash = spl_object_hash($entity);
+        if ($this->isManaged($entity) && !isset($this->scheduledUnindexations[$entityHash])) {
+            $this->scheduledUnindexations[$entityHash] = $entity;
         }
     }
 
