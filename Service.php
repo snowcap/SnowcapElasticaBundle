@@ -2,14 +2,12 @@
 
 namespace Snowcap\ElasticaBundle;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-
 use Elastica\Index;
 use Elastica\ResultSet;
 use Elastica\Search;
 use Elastica\Type\Mapping;
-
 use Snowcap\ElasticaBundle\Indexer\IndexerInterface;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
  * This service class is the main entry point for Elastica operations
@@ -100,6 +98,41 @@ class Service extends ContainerAware implements ServiceInterface
                 }
                 $this->container->get('doctrine.orm.entity_manager')->clear();
             }
+        }
+    }
+
+    /**
+     * Rebuild one type associated to all indexes
+     *
+     * @param string $typeName
+     */
+    public function rebuildType($typeName)
+    {
+        // Check indexer with the given type name
+        if (!isset($typeName, $this->indexers)) {
+            throw new \UnexpectedValueException(sprintf('The indexer for type "%s" does not exist.', $typeName));
+        }
+
+        /** @var IndexerInterface $indexer */
+        $indexer = $this->indexers[$typeName];
+
+        foreach ($this->indexes as $indexName => $indexParams) {
+            $index = $this->client->getIndex($indexName);
+            $type = $index->getType($typeName);
+
+            // Create the type with the correct mapping
+            $type->delete();
+            $mapping = new Mapping();
+            $mapping->setType($type);
+            $mapping->setProperties($indexer->getMappings());
+            $mapping->send();
+
+            // Reindex data
+            $entities = $indexer->getEntitiesToIndex($this->container->get('doctrine.orm.entity_manager'), $type);
+            foreach($entities as $entity) {
+                $indexer->addIndex($entity, $type);
+            }
+            $this->container->get('doctrine.orm.entity_manager')->clear();
         }
     }
 
