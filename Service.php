@@ -174,9 +174,10 @@ class Service extends ContainerAware implements ServiceInterface
      * @param string $query
      * @param string|array $index
      * @param array $types
+     * @param array|int|null $options
      * @return ResultSet
      */
-    public function search($query, $index, $types = null)
+    public function search($query, $index, $types = null, $options = null)
     {
         $search = new Search($this->client);
 
@@ -192,7 +193,7 @@ class Service extends ContainerAware implements ServiceInterface
         }
 
         $search->addTypes($types);
-        return $search->search($query);
+        return $search->search($query, $options);
     }
 
     /**
